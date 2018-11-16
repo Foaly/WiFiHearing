@@ -88,13 +88,13 @@ static void ICACHE_FLASH_ATTR sniffer_callback(uint8_t *buffer, uint16_t length)
 void channelHop()
 {
   // send out data
-  Serial.print("{ \"Channel\": \"");
+  Serial.print("{\"");
   Serial.print(currentChannel, DEC);
 
-  Serial.print("\", \"Count\": \"");
+  Serial.print("\",\"");
   Serial.print(packetCount[currentChannel], DEC);
 
-  Serial.println("\" }");
+  Serial.println("\"}");
 
   // hoping channels
   currentChannel = wifi_get_channel() + 1;
