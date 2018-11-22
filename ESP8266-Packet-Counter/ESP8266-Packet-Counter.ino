@@ -20,6 +20,7 @@
 extern "C" {
   #include <user_interface.h>
 }
+#include <elapsedMillis.h>
 
 #define DATA_LENGTH           112
 
@@ -33,6 +34,8 @@ extern "C" {
 
 #define CHANNEL_HOP_INTERVAL_MS   1000
 #define MAX_CHANNELS              14
+// On a NodeMCU board the built-in led is on GPIO pin 2
+#define LED_BUILTIN 2
 
 
 struct RxControl {
@@ -73,6 +76,8 @@ static os_timer_t channelHop_timer;
 
 uint32_t packetCount[MAX_CHANNELS + 1] = {0};
 uint8_t currentChannel = 1;
+elapsedMillis LEDtimer;
+bool isLEDOn = false;
 
 /**
  * Callback for promiscuous mode
@@ -102,6 +107,11 @@ void channelHop()
     currentChannel = 1;
   wifi_set_channel(currentChannel);
 
+  // Turn LED on
+  isLEDOn = true;
+  digitalWrite(LED_BUILTIN, LOW);
+  LEDtimer = 0;
+
   packetCount[currentChannel] = 0;
 }
 
@@ -122,8 +132,17 @@ void setup() {
   os_timer_disarm(&channelHop_timer);
   os_timer_setfn(&channelHop_timer, (os_timer_func_t *) channelHop, NULL);
   os_timer_arm(&channelHop_timer, CHANNEL_HOP_INTERVAL_MS, 1);
+
+  // Initialize the LED_BUILTIN pin as an output
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
-  delay(10);
+    // turn the LED off after some time
+    if (isLEDOn && LEDtimer > 10)
+    {
+        digitalWrite(LED_BUILTIN, HIGH);
+        isLEDOn = false;
+    }
+    delay(10);
 }
