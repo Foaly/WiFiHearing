@@ -86,8 +86,8 @@ enum class Status
     PaketStart,
     Channel,
     ChannelDone,
-    Count,
     Separator,
+    Count,
     CountDone
 };
 Status packetStatus = Status::None;
@@ -161,7 +161,7 @@ void loop() {
                     Serial.print(" = ");
                     Serial.print(count);
                     Serial.print("\n");
-                    if (channel <= CHANNELS)
+                    if (channel > 0 && channel <= CHANNELS)
                         soundGenerators[channel - 1].envelope.noteOn();
                     channel = 0;
                     count = 0;

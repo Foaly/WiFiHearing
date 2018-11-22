@@ -72,7 +72,7 @@ struct SnifferPacket{
 static os_timer_t channelHop_timer;
 
 uint32_t packetCount[MAX_CHANNELS + 1] = {0};
-uint8_t currentChannel = 0;
+uint8_t currentChannel = 1;
 
 /**
  * Callback for promiscuous mode
