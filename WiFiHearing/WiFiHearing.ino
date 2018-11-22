@@ -23,7 +23,7 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
-#define CHANNELS 12
+#define CHANNELS 13
 
 struct SoundGenerator
 {
@@ -34,8 +34,8 @@ struct SoundGenerator
 
 SoundGenerator soundGenerators[CHANNELS];
 /* Frequencies taken from https://de.wikipedia.org/wiki/Frequenzen_der_gleichstufigen_Stimmung */
-                                 /*   Fis,     Gis,     Ais,     cis,     dis,     fis,     gis,     ais,   cis¹,     dis¹,    fis¹,   gis¹ */
-float pentatonicScale[CHANNELS] = { 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f};
+                                 /*    Dis,   Fis,     Gis,     Ais,     cis,     dis,     fis,     gis,     ais,   cis¹,     dis¹,    fis¹,   gis¹ */
+float pentatonicScale[CHANNELS] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f };
 
 // GUItool: begin automatically generated code
 /*AudioSynthWaveform       waveform7;      //xy=239,732
@@ -79,6 +79,7 @@ AudioConnection          patchCord2(soundGenerators[8].waveform, soundGenerators
 AudioConnection          patchCord4(soundGenerators[9].waveform, soundGenerators[9].envelope);
 AudioConnection          patchCord10(soundGenerators[10].waveform, soundGenerators[10].envelope);
 AudioConnection          patchCord11(soundGenerators[11].waveform, soundGenerators[11].envelope);
+AudioConnection          patchCord30(soundGenerators[12].waveform, soundGenerators[12].envelope);
 AudioConnection          patchCord13(soundGenerators[0].envelope, 0, mixer1, 0);
 AudioConnection          patchCord18(soundGenerators[1].envelope, 0, mixer1, 1);
 AudioConnection          patchCord22(soundGenerators[2].envelope, 0, mixer1, 2);
@@ -91,6 +92,7 @@ AudioConnection          patchCord17(soundGenerators[8].envelope, 0, mixer3, 0);
 AudioConnection          patchCord20(soundGenerators[9].envelope, 0, mixer3, 1);
 AudioConnection          patchCord23(soundGenerators[10].envelope, 0, mixer3, 2);
 AudioConnection          patchCord24(soundGenerators[11].envelope, 0, mixer3, 3);
+AudioConnection          patchCord31(soundGenerators[12].envelope, 0, mixer4, 3);
 AudioConnection          patchCord25(mixer1, 0, mixer4, 0);
 AudioConnection          patchCord26(mixer2, 0, mixer4, 1);
 AudioConnection          patchCord27(mixer3, 0, mixer4, 2);
@@ -183,7 +185,8 @@ void loop() {
                     Serial.print(" = ");
                     Serial.print(count);
                     Serial.print("\n");
-
+                    if (channel <= CHANNELS)
+                        soundGenerators[channel - 1].envelope.noteOn();
                     channel = 0;
                     count = 0;
                     packetStatus = Status::None;
