@@ -68,7 +68,7 @@ AudioMixer4              mixer3;         //xy=700,866
 AudioMixer4              mixer4;         //xy=928,648
 AudioOutputI2S           i2sOut;         //xy=1122,648
 AudioConnection          patchCord12(soundGenerators[0].waveform, soundGenerators[0].envelope);
-AudioConnection          patchCord9(soundGenerators[1].waveform, soundGenerators[9].envelope);
+AudioConnection          patchCord9(soundGenerators[1].waveform, soundGenerators[1].envelope);
 AudioConnection          patchCord8(soundGenerators[2].waveform, soundGenerators[2].envelope);
 AudioConnection          patchCord6(soundGenerators[3].waveform, soundGenerators[3].envelope);
 AudioConnection          patchCord7(soundGenerators[4].waveform, soundGenerators[4].envelope);
