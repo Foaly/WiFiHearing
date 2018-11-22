@@ -38,30 +38,6 @@ SoundGenerator soundGenerators[CHANNELS];
 float pentatonicScale[CHANNELS] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f };
 
 // GUItool: begin automatically generated code
-/*AudioSynthWaveform       waveform7;      //xy=239,732
-AudioSynthWaveform       waveform8;      //xy=240,788
-AudioSynthWaveform       waveform5;      //xy=241,623
-AudioSynthWaveform       waveform9;      //xy=241,846
-AudioSynthWaveform       waveform6;      //xy=243,677
-AudioSynthWaveform       waveform3;      //xy=244,506
-AudioSynthWaveform       waveform4;      //xy=244,569
-AudioSynthWaveform       waveform2;      //xy=246,440
-AudioSynthWaveform       waveform1;      //xy=247,377
-AudioSynthWaveform       waveform10;     //xy=245,901
-AudioSynthWaveform       waveform11;     //xy=246,951
-AudioSynthWaveform       waveform0;           //xy=249,310
-AudioEffectEnvelope      envelope;       //xy=470,311
-AudioEffectEnvelope      envelope6;      //xy=469,676
-AudioEffectEnvelope      envelope7;      //xy=469,733
-AudioEffectEnvelope      envelope3;      //xy=470,507
-AudioEffectEnvelope      envelope8;      //xy=469,788
-AudioEffectEnvelope      envelope1;      //xy=471,377
-AudioEffectEnvelope      envelope4;      //xy=471,570
-AudioEffectEnvelope      envelope9;      //xy=470,846
-AudioEffectEnvelope      envelope5;      //xy=471,623
-AudioEffectEnvelope      envelope2;      //xy=473,441
-AudioEffectEnvelope      envelope10;     //xy=473,899
-AudioEffectEnvelope      envelope11;     //xy=473,949*/
 AudioMixer4              mixer1;         //xy=697,417
 AudioMixer4              mixer2;         //xy=697,651
 AudioMixer4              mixer3;         //xy=700,866
@@ -194,11 +170,5 @@ void loop() {
                 break;
         }
         // Serial.println(incomingByte);
-    }
-
-    if (elapsedMs >= 300)
-    {
-        soundGenerators[1].envelope.noteOn();
-        elapsedMs = 0;
     }
 }
