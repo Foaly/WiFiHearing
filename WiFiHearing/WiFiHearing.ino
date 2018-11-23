@@ -37,6 +37,9 @@ SoundGenerator soundGenerators[CHANNELS];
                                  /*    Dis,   Fis,     Gis,     Ais,     cis,     dis,     fis,     gis,     ais,   cis¹,     dis¹,    fis¹,   gis¹ */
 float pentatonicScale[CHANNELS] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f };
 
+                                         /*    Dis,     Gis,     cis,     fis,     ais,    dis¹,   gis¹,    cis²,    fis²,    ais²,     dis³,     gis³,     cis⁴*/
+float pentatonicScaleCochlear[CHANNELS] = { 77.78f, 103.83f, 138.59f, 184.99f, 233.08f, 311.13f, 415.3f, 554.37f, 739.99f, 932.33f, 1244.51f, 1661.22f, 2217.46f};
+
 // GUItool: begin automatically generated code
 AudioMixer4              mixer1;         //xy=697,417
 AudioMixer4              mixer2;         //xy=697,651
@@ -107,10 +110,10 @@ void setup() {
     {
         soundGenerators[i].waveform.begin(WAVEFORM_SINE);
         soundGenerators[i].waveform.amplitude(0.7);
-        soundGenerators[i].waveform.frequency(pentatonicScale[i]);
+        soundGenerators[i].waveform.frequency(pentatonicScaleCochlear[i]);
 
         soundGenerators[i].envelope.attack(10.f);
-        soundGenerators[i].envelope.hold(70.f);
+        soundGenerators[i].envelope.hold(90.f);
         soundGenerators[i].envelope.delay(40.f);
         soundGenerators[i].envelope.sustain(0.f);
 
