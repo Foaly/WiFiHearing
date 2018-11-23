@@ -23,6 +23,8 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
+#include <cmath>
+
 #define CHANNELS 13
 
 struct SoundGenerator
@@ -30,6 +32,7 @@ struct SoundGenerator
     AudioSynthWaveform waveform;
     AudioEffectEnvelope envelope;
     elapsedMillis elapsedMs;
+    unsigned int rateInMs;
 };
 
 SoundGenerator soundGenerators[CHANNELS];
@@ -97,6 +100,19 @@ Status packetStatus = Status::None;
 unsigned int channel = 0;
 unsigned int count = 0;
 
+
+unsigned int saturationCurve(unsigned int packetCount)
+{
+    return static_cast<unsigned int>(std::round(std::sqrt(packetCount/4) * 12 + 30));
+}
+
+
+unsigned int BPMtoMs(unsigned int BPM)
+{
+    return static_cast<unsigned int >(std::round((60.f * 1000.f) / BPM));
+}
+
+
 void setup() {
     Serial4.begin(115200);
     Serial.begin(115200);
@@ -104,7 +120,7 @@ void setup() {
     AudioMemory(150);
     audioShield.enable();
     audioShield.micGain(60);  //0-63
-    audioShield.volume(0.8);  //0-1
+    audioShield.volume(0.5);  //0-1
 
     for (unsigned int i = 0; i < CHANNELS; ++i)
     {
@@ -118,6 +134,7 @@ void setup() {
         soundGenerators[i].envelope.sustain(0.f);
 
         soundGenerators[i].elapsedMs = 0;
+        soundGenerators[i].rateInMs = 1000;
     }
 }
 
@@ -165,7 +182,17 @@ void loop() {
                     Serial.print(count);
                     Serial.print("\n");
                     if (channel > 0 && channel <= CHANNELS)
-                        soundGenerators[channel - 1].envelope.noteOn();
+                    {
+                        unsigned int BPM = saturationCurve(count);
+                        unsigned int ms = BPMtoMs(BPM);
+                        /*Serial.print("BPM: ");
+                        Serial.print(BPM);
+                        Serial.print(" ms: ");
+                        Serial.println(ms);*/
+                        //soundGenerators[channel - 1].envelope.noteOn();
+                        soundGenerators[channel - 1].rateInMs = ms;
+                        soundGenerators[channel - 1].elapsedMs = 0;
+                    }
                     channel = 0;
                     count = 0;
                     packetStatus = Status::None;
@@ -173,5 +200,15 @@ void loop() {
                 break;
         }
         // Serial.println(incomingByte);
+    }
+
+    // Iterate through the soundGenerators and trigger the envelopes once enough time has passed
+    for(auto& soundGenerator: soundGenerators)
+    {
+        if (soundGenerator.elapsedMs >= soundGenerator.rateInMs)
+        {
+            soundGenerator.envelope.noteOn();
+            soundGenerator.elapsedMs = 0;
+        }
     }
 }
