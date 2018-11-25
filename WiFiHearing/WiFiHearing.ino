@@ -158,7 +158,10 @@ void loop() {
                 if (incomingByte == '\"')
                     packetStatus = Status::ChannelDone;
                 else
-                    channel = (channel * 10) + atoi(&incomingByte);
+                {
+                    channel *= 10; // shift one decimal left
+                    channel = (incomingByte - 48) + channel; // convert from ASCII and add
+                }
                 break;
             case Status::ChannelDone:
                 if (incomingByte == ',')
@@ -172,7 +175,10 @@ void loop() {
                 if (incomingByte == '\"')
                     packetStatus = Status::CountDone;
                 else
-                    count = (count * 10) + atoi(&incomingByte);
+                {
+                    count *= 10; // shift one decimal left
+                    count = (incomingByte - 48) + count; // convert from ASCII and add
+                }
                 break;
             case Status::CountDone:
                 if (incomingByte == '}') {
