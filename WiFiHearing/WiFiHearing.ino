@@ -134,7 +134,7 @@ void setup() {
         soundGenerators[i].envelope.sustain(0.f);
 
         soundGenerators[i].elapsedMs = 0;
-        soundGenerators[i].rateInMs = 1000;
+        soundGenerators[i].rateInMs = 0;
     }
 
     // crude way to avoid clipping
@@ -207,14 +207,19 @@ void loop() {
                     Serial.print("\n");
                     if (channel > 0 && channel <= CHANNELS)
                     {
-                        unsigned int BPM = saturationCurve(count);
-                        unsigned int ms = BPMtoMs(BPM);
-                        /*Serial.print("BPM: ");
-                        Serial.print(BPM);
-                        Serial.print(" ms: ");
-                        Serial.println(ms);*/
+                        if (count == 0)
+                            soundGenerators[channel - 1].rateInMs = 0;
+                        else
+                        {
+                            unsigned int BPM = saturationCurve(count);
+                            unsigned int ms = BPMtoMs(BPM);
+                            /*Serial.print("BPM: ");
+                            Serial.print(BPM);
+                            Serial.print(" ms: ");
+                            Serial.println(ms);*/
+                            soundGenerators[channel - 1].rateInMs = ms;
+                        }
                         //soundGenerators[channel - 1].envelope.noteOn();
-                        soundGenerators[channel - 1].rateInMs = ms;
                         soundGenerators[channel - 1].elapsedMs = 0;
                     }
                     channel = 0;
@@ -229,7 +234,7 @@ void loop() {
     // Iterate through the soundGenerators and trigger the envelopes once enough time has passed
     for(auto& soundGenerator: soundGenerators)
     {
-        if (soundGenerator.elapsedMs >= soundGenerator.rateInMs)
+        if (soundGenerator.rateInMs != 0 && soundGenerator.elapsedMs >= soundGenerator.rateInMs)
         {
             soundGenerator.envelope.noteOn();
             soundGenerator.elapsedMs = 0;
