@@ -113,6 +113,19 @@ unsigned int BPMtoMs(unsigned int BPM)
 }
 
 
+// Returns the gain factor for a given frequency
+// so that they have equal loudness
+float AWeightedGain(float f)
+{
+    // see https://en.wikipedia.org/wiki/A-weighting
+    float numerator = (12194 * 12194) * std::pow(f, 4);
+    float denominator = (f*f + 20.6f * 20.6f) * std::sqrt( (f*f + 107.7f * 107.7f) * (f*f + 737.9f * 737.9f) ) * (f*f + 12194 * 12194);
+    float weight = numerator / denominator;
+    float gainDB = 20.f * std::log10(weight) + 2.f; // convert to dB and add offset to normalize 0db to 1kHz
+    return std::pow(10.f, -gainDB / 20.f); // convert to gain factor in dbFS
+}
+
+
 void setup() {
     Serial4.begin(115200);
     Serial.begin(115200);
@@ -120,14 +133,14 @@ void setup() {
     AudioMemory(150);
     audioShield.enable();
     audioShield.micGain(60);  //0-63
-    audioShield.volume(0.7);  //0-1
+    audioShield.volume(0.8);  //0-1
 
     // setup the sound generators
     for (unsigned int i = 0; i < CHANNELS; ++i)
     {
         soundGenerators[i].waveform.begin(WAVEFORM_SINE);
-        soundGenerators[i].waveform.amplitude(0.9);
-        soundGenerators[i].waveform.frequency(pentatonicScaleCochlear[i]);
+        soundGenerators[i].waveform.amplitude( AWeightedGain( pentatonicScaleCochlear[i] ) );
+        soundGenerators[i].waveform.frequency( pentatonicScaleCochlear[i] );
 
         soundGenerators[i].envelope.attack(10.f);
         soundGenerators[i].envelope.hold(90.f);
