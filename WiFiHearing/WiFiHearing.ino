@@ -40,8 +40,8 @@ SoundGenerator soundGenerators[CHANNELS];
                                  /*    D♯₂,   F♯₂,     G♯₂,     A♯₂,     C♯₃,     D♯₃,     F♯₃,     G♯₃,     A♯₃,    C♯₄,      D♯₄,     F♯₄,    G♯₄ */
 float pentatonicScale[CHANNELS] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f };
 
-                                         /*    D♯₂,     G♯₂,     C♯₃,     F♯₃,     A♯₃,     D♯₄,    G♯₄,     C♯₅,     F♯₅,     A♯₅,      D♯₆,      G♯₆,      C♯₇ */
-float pentatonicScaleCochlear[CHANNELS] = { 77.78f, 103.83f, 138.59f, 184.99f, 233.08f, 311.13f, 415.3f, 554.37f, 739.99f, 932.33f, 1244.51f, 1661.22f, 2217.46f };
+                                         /*    D♯₂,     F♯₃,     C♯₄,     F♯₄,     A♯₄,     D♯₅,     F♯₅,     G♯₅,     A♯₅,      C♯₆,      D♯₆,      G♯₆,      C♯₇ */
+float pentatonicScaleCochlear[CHANNELS] = { 77.78f, 184.99f, 277.18f, 369.99f, 466.16f, 622.25f, 739.99f, 830.60f, 932.33f, 1108.73f, 1244.51f, 1661.22f, 2217.46f };
 
 // GUItool: begin automatically generated code
 AudioMixer4              mixer1;         //xy=697,417
