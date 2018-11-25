@@ -120,12 +120,12 @@ void setup() {
     AudioMemory(150);
     audioShield.enable();
     audioShield.micGain(60);  //0-63
-    audioShield.volume(0.5);  //0-1
+    audioShield.volume(0.7);  //0-1
 
     for (unsigned int i = 0; i < CHANNELS; ++i)
     {
         soundGenerators[i].waveform.begin(WAVEFORM_SINE);
-        soundGenerators[i].waveform.amplitude(0.7);
+        soundGenerators[i].waveform.amplitude(0.9);
         soundGenerators[i].waveform.frequency(pentatonicScaleCochlear[i]);
 
         soundGenerators[i].envelope.attack(10.f);
@@ -136,6 +136,24 @@ void setup() {
         soundGenerators[i].elapsedMs = 0;
         soundGenerators[i].rateInMs = 1000;
     }
+
+    // crude way to avoid clipping
+    mixer1.gain(0, 0.25f);
+    mixer1.gain(1, 0.25f);
+    mixer1.gain(2, 0.25f);
+    mixer1.gain(3, 0.25f);
+    mixer2.gain(0, 0.25f);
+    mixer2.gain(1, 0.25f);
+    mixer2.gain(2, 0.25f);
+    mixer2.gain(3, 0.25f);
+    mixer3.gain(0, 0.25f);
+    mixer3.gain(1, 0.25f);
+    mixer3.gain(2, 0.25f);
+    mixer3.gain(3, 0.25f);
+    mixer4.gain(0, 0.25f);
+    mixer4.gain(1, 0.25f);
+    mixer4.gain(2, 0.25f);
+    mixer4.gain(3, 0.0625f);
 }
 
 void loop() {
