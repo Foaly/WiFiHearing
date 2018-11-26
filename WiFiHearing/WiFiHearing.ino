@@ -31,6 +31,7 @@ struct SoundGenerator
 {
     AudioSynthWaveform waveform;
     AudioEffectEnvelope envelope;
+    AudioConnection patchCoord {waveform, envelope};
     elapsedMillis elapsedMs;
     unsigned int rateInMs;
 };
@@ -43,45 +44,31 @@ const float pentatonicScale[CHANNELS] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.5
                                                /*    D♯₂,     F♯₃,     C♯₄,     F♯₄,     A♯₄,     D♯₅,     F♯₅,     G♯₅,     A♯₅,      C♯₆,      D♯₆,      G♯₆,      C♯₇ */
 const float pentatonicScaleCochlear[CHANNELS] = { 77.78f, 184.99f, 277.18f, 369.99f, 466.16f, 622.25f, 739.99f, 830.60f, 932.33f, 1108.73f, 1244.51f, 1661.22f, 2217.46f };
 
-// GUItool: begin automatically generated code
-AudioMixer4              mixer1;         //xy=697,417
-AudioMixer4              mixer2;         //xy=697,651
-AudioMixer4              mixer3;         //xy=700,866
-AudioMixer4              mixer4;         //xy=928,648
-AudioOutputI2S           i2sOut;         //xy=1122,648
-AudioConnection          patchCord12(soundGenerators[0].waveform, soundGenerators[0].envelope);
-AudioConnection          patchCord9(soundGenerators[1].waveform, soundGenerators[1].envelope);
-AudioConnection          patchCord8(soundGenerators[2].waveform, soundGenerators[2].envelope);
-AudioConnection          patchCord6(soundGenerators[3].waveform, soundGenerators[3].envelope);
-AudioConnection          patchCord7(soundGenerators[4].waveform, soundGenerators[4].envelope);
-AudioConnection          patchCord3(soundGenerators[5].waveform, soundGenerators[5].envelope);
-AudioConnection          patchCord5(soundGenerators[6].waveform, soundGenerators[6].envelope);
-AudioConnection          patchCord1(soundGenerators[7].waveform, soundGenerators[7].envelope);
-AudioConnection          patchCord2(soundGenerators[8].waveform, soundGenerators[8].envelope);
-AudioConnection          patchCord4(soundGenerators[9].waveform, soundGenerators[9].envelope);
-AudioConnection          patchCord10(soundGenerators[10].waveform, soundGenerators[10].envelope);
-AudioConnection          patchCord11(soundGenerators[11].waveform, soundGenerators[11].envelope);
-AudioConnection          patchCord30(soundGenerators[12].waveform, soundGenerators[12].envelope);
-AudioConnection          patchCord13(soundGenerators[0].envelope, 0, mixer1, 0);
-AudioConnection          patchCord18(soundGenerators[1].envelope, 0, mixer1, 1);
-AudioConnection          patchCord22(soundGenerators[2].envelope, 0, mixer1, 2);
-AudioConnection          patchCord16(soundGenerators[3].envelope, 0, mixer1, 3);
-AudioConnection          patchCord19(soundGenerators[4].envelope, 0, mixer2, 0);
-AudioConnection          patchCord21(soundGenerators[5].envelope, 0, mixer2, 1);
-AudioConnection          patchCord14(soundGenerators[6].envelope, 0, mixer2, 2);
-AudioConnection          patchCord15(soundGenerators[7].envelope, 0, mixer2, 3);
-AudioConnection          patchCord17(soundGenerators[8].envelope, 0, mixer3, 0);
-AudioConnection          patchCord20(soundGenerators[9].envelope, 0, mixer3, 1);
-AudioConnection          patchCord23(soundGenerators[10].envelope, 0, mixer3, 2);
-AudioConnection          patchCord24(soundGenerators[11].envelope, 0, mixer3, 3);
-AudioConnection          patchCord31(soundGenerators[12].envelope, 0, mixer4, 3);
-AudioConnection          patchCord25(mixer1, 0, mixer4, 0);
-AudioConnection          patchCord26(mixer2, 0, mixer4, 1);
-AudioConnection          patchCord27(mixer3, 0, mixer4, 2);
-AudioConnection          patchCord28(mixer4, 0, i2sOut, 0);
-AudioConnection          patchCord29(mixer4, 0, i2sOut, 1);
-AudioControlSGTL5000     audioShield;    //xy=452,203
-// GUItool: end automatically generated code
+// Audio graph
+AudioMixer4              mixer1;
+AudioMixer4              mixer2;
+AudioMixer4              mixer3;
+AudioMixer4              mixer4;
+AudioOutputI2S           i2sOut;
+AudioConnection          patchCord1(soundGenerators[0].envelope, 0, mixer1, 0);
+AudioConnection          patchCord2(soundGenerators[1].envelope, 0, mixer1, 1);
+AudioConnection          patchCord3(soundGenerators[2].envelope, 0, mixer1, 2);
+AudioConnection          patchCord4(soundGenerators[3].envelope, 0, mixer1, 3);
+AudioConnection          patchCord5(soundGenerators[4].envelope, 0, mixer2, 0);
+AudioConnection          patchCord6(soundGenerators[5].envelope, 0, mixer2, 1);
+AudioConnection          patchCord7(soundGenerators[6].envelope, 0, mixer2, 2);
+AudioConnection          patchCord8(soundGenerators[7].envelope, 0, mixer2, 3);
+AudioConnection          patchCord9(soundGenerators[8].envelope, 0, mixer3, 0);
+AudioConnection          patchCord10(soundGenerators[9].envelope, 0, mixer3, 1);
+AudioConnection          patchCord11(soundGenerators[10].envelope, 0, mixer3, 2);
+AudioConnection          patchCord12(soundGenerators[11].envelope, 0, mixer3, 3);
+AudioConnection          patchCord13(soundGenerators[12].envelope, 0, mixer4, 3);
+AudioConnection          patchCord14(mixer1, 0, mixer4, 0);
+AudioConnection          patchCord15(mixer2, 0, mixer4, 1);
+AudioConnection          patchCord16(mixer3, 0, mixer4, 2);
+AudioConnection          patchCord17(mixer4, 0, i2sOut, 0);
+AudioConnection          patchCord18(mixer4, 0, i2sOut, 1);
+AudioControlSGTL5000     audioShield;
 
 
 elapsedMillis elapsedMs;
@@ -176,7 +163,7 @@ void loop() {
     {
         char incomingByte = Serial4.read();
 
-        // {"12", "300"}
+        // {"12", "1337"}
         switch(packetStatus)
         {
             case Status::None:
