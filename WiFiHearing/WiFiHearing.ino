@@ -75,9 +75,10 @@ AudioControlSGTL5000     audioShield;
 
 
 // convert packet count to BPM
-unsigned int saturationCurve(unsigned int packetCount)
+unsigned int countToBPM(unsigned int packetCount)
 {
-    return static_cast<unsigned int>(std::round(std::sqrt(packetCount/4) * 12 + 30));
+    //return static_cast<unsigned int>(std::round(std::sqrt(packetCount/4) * 12 + 20)); //curved 
+    return static_cast<unsigned int>( packetCount / 6 + 50); // linear 
 }
 
 
@@ -109,7 +110,7 @@ void packetParsed(unsigned int channel, unsigned int count)
             soundGenerators[channel - 1].rateInMs = 0;
         else
         {
-            unsigned int BPM = saturationCurve(count);
+            unsigned int BPM = countToBPM(count);
             unsigned int ms = BPMtoMs(BPM);
             /*Serial.print("BPM: ");
             Serial.print(BPM);
