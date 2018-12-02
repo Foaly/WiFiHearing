@@ -37,7 +37,7 @@ struct SoundGenerator
 };
 
 SoundGenerator soundGenerators[CHANNELS];
-/* Frequencies taken from https://de.wikipedia.org/wiki/Frequenzen_der_gleichstufigen_Stimmung */
+/* Frequencies taken from https://en.wikipedia.org/wiki/Piano_key_frequencies */
                                        /*    D♯₂,   F♯₂,     G♯₂,     A♯₂,     C♯₃,     D♯₃,     F♯₃,     G♯₃,     A♯₃,    C♯₄,      D♯₄,     F♯₄,    G♯₄ */
 const float pentatonicScale[CHANNELS] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f };
 
@@ -88,6 +88,7 @@ unsigned int channel = 0;
 unsigned int count = 0;
 
 
+// convert packet count to BPM
 unsigned int saturationCurve(unsigned int packetCount)
 {
     return static_cast<unsigned int>(std::round(std::sqrt(packetCount/4) * 12 + 30));
@@ -119,7 +120,6 @@ void setup() {
 
     AudioMemory(150);
     audioShield.enable();
-    audioShield.micGain(60);  //0-63
     audioShield.volume(0.8);  //0-1
 
     // setup the sound generators
