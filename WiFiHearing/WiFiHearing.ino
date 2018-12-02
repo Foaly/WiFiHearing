@@ -23,6 +23,8 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
+#include "PacketParser.h"
+
 #include <cmath>
 
 #define CHANNELS 13
@@ -71,22 +73,6 @@ AudioConnection          patchCord18(mixer4, 0, i2sOut, 1);
 AudioControlSGTL5000     audioShield;
 
 
-elapsedMillis elapsedMs;
-
-enum class Status
-{
-    None,
-    PaketStart,
-    Channel,
-    ChannelDone,
-    Separator,
-    Count,
-    CountDone
-};
-Status packetStatus = Status::None;
-unsigned int channel = 0;
-unsigned int count = 0;
-
 
 // convert packet count to BPM
 unsigned int saturationCurve(unsigned int packetCount)
@@ -112,6 +98,32 @@ float AWeightedGain(float f)
     float gainDB = 20.f * std::log10(weight) + 2.f; // convert to dB and add offset to normalize 0db to 1kHz
     return std::pow(10.f, -gainDB / 20.f); // convert to gain factor in dbFS
 }
+
+
+// callback that is called everytime a channel update packet is succesfully received
+void packetParsed(unsigned int channel, unsigned int count)
+{
+    if (channel > 0 && channel <= CHANNELS)
+    {
+        if (count == 0)
+            soundGenerators[channel - 1].rateInMs = 0;
+        else
+        {
+            unsigned int BPM = saturationCurve(count);
+            unsigned int ms = BPMtoMs(BPM);
+            /*Serial.print("BPM: ");
+            Serial.print(BPM);
+            Serial.print(" ms: ");
+            Serial.println(ms);*/
+            soundGenerators[channel - 1].rateInMs = ms;
+        }
+        //soundGenerators[channel - 1].envelope.noteOn();
+        soundGenerators[channel - 1].elapsedMs = 0;
+    }
+}
+
+
+PacketParser packetParser(packetParsed);
 
 
 void setup() {
@@ -162,75 +174,9 @@ void loop() {
     if (Serial4.available() > 0)
     {
         char incomingByte = Serial4.read();
-
-        // {"12", "1337"}
-        switch(packetStatus)
-        {
-            case Status::None:
-                if (incomingByte == '{')
-                    packetStatus = Status::PaketStart;
-                break;
-            case Status::PaketStart:
-                if (incomingByte == '\"')
-                    packetStatus = Status::Channel;
-                break;
-            case Status::Channel:
-                if (incomingByte == '\"')
-                    packetStatus = Status::ChannelDone;
-                else
-                {
-                    channel *= 10; // shift one decimal left
-                    channel = (incomingByte - 48) + channel; // convert from ASCII and add
-                }
-                break;
-            case Status::ChannelDone:
-                if (incomingByte == ',')
-                    packetStatus = Status::Separator;
-                break;
-            case Status::Separator:
-                if (incomingByte == '\"')
-                    packetStatus = Status::Count;
-                break;
-            case Status::Count:
-                if (incomingByte == '\"')
-                    packetStatus = Status::CountDone;
-                else
-                {
-                    count *= 10; // shift one decimal left
-                    count = (incomingByte - 48) + count; // convert from ASCII and add
-                }
-                break;
-            case Status::CountDone:
-                if (incomingByte == '}') {
-                    Serial.print("c: ");
-                    Serial.print(channel);
-                    Serial.print(" = ");
-                    Serial.print(count);
-                    Serial.print("\n");
-                    if (channel > 0 && channel <= CHANNELS)
-                    {
-                        if (count == 0)
-                            soundGenerators[channel - 1].rateInMs = 0;
-                        else
-                        {
-                            unsigned int BPM = saturationCurve(count);
-                            unsigned int ms = BPMtoMs(BPM);
-                            /*Serial.print("BPM: ");
-                            Serial.print(BPM);
-                            Serial.print(" ms: ");
-                            Serial.println(ms);*/
-                            soundGenerators[channel - 1].rateInMs = ms;
-                        }
-                        //soundGenerators[channel - 1].envelope.noteOn();
-                        soundGenerators[channel - 1].elapsedMs = 0;
-                    }
-                    channel = 0;
-                    count = 0;
-                    packetStatus = Status::None;
-                }
-                break;
-        }
+        packetParser.parseByte(incomingByte);
         // Serial.println(incomingByte);
+
     }
 
     // Iterate through the soundGenerators and trigger the envelopes once enough time has passed
