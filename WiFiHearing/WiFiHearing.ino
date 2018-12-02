@@ -102,7 +102,7 @@ float AWeightedGain(float f)
 
 
 // callback that is called everytime a channel update packet is succesfully received
-void packetParsed(unsigned int channel, unsigned int count)
+void packetParsed(uint8_t channel, uint16_t count)
 {
     if (channel > 0 && channel <= CHANNELS)
     {
@@ -174,7 +174,7 @@ void loop() {
     // parse serial input
     if (Serial4.available() > 0)
     {
-        char incomingByte = Serial4.read();
+        uint8_t incomingByte = Serial4.read();
         packetParser.parseByte(incomingByte);
         // Serial.println(incomingByte);
 

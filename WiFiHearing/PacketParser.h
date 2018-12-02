@@ -22,76 +22,81 @@
 
 class PacketParser {
 public:
-    PacketParser(void (*onSuccessCallback)(unsigned int, unsigned int) );
+    PacketParser(void (*onSuccessCallback)(uint8_t, uint16_t) );
 
-    void parseByte(char receivedByte);
+    void parseByte(uint8_t receivedByte);
 
 private:
 
     enum class Status
     {
         None,
-        PaketStart,
         Channel,
         ChannelDone,
-        Separator,
         Count,
         CountDone
     };
 
     Status m_packetStatus;
-    void (*m_onSuccessCallback)(unsigned int, unsigned int);
-    unsigned int m_channel;
-    unsigned int m_count;
+    void (*m_onSuccessCallback)(uint8_t, uint16_t);
+    uint8_t m_channel;
+    uint16_t m_count;
+    uint8_t m_byteCounter;
 };
 
 
-PacketParser::PacketParser(void (*onSuccessCallback)(unsigned int, unsigned int))
+PacketParser::PacketParser(void (*onSuccessCallback)(uint8_t, uint16_t))
     : m_packetStatus(Status::None)
     , m_onSuccessCallback(onSuccessCallback)
     , m_channel(0)
     , m_count(0)
+    , m_byteCounter(0)
 {
 }
 
 
-void PacketParser::parseByte(char receivedByte)
+/**
+ *  Only packets with the following format will be parsed correctly:
+ *  Packets start with a byte containing the character '{'
+ *  Followed by a byte containing the channel number in binary. Channel counts starts at 1.
+ *  A delimiter byte containing the character ',' follows.
+ *  The next two bytes are a 16-bit integer containing the packet count. It is sent in little-endian order (LSB first).
+ *  The last byte in a packet is a '}' character.
+ */
+void PacketParser::parseByte(uint8_t receivedByte)
 {
-    // {"12", "1337"}
+    /*Serial.print("Status: ");
+    Serial.println((int)m_packetStatus);
+    Serial.print((char)receivedByte);
+    Serial.print(" in bin: ");
+    Serial.println(receivedByte, BIN);*/
+  
     switch(m_packetStatus)
     {
         case Status::None:
             if (receivedByte == '{')
-                m_packetStatus = Status::PaketStart;
-            break;
-        case Status::PaketStart:
-            if (receivedByte == '\"')
                 m_packetStatus = Status::Channel;
             break;
         case Status::Channel:
-            if (receivedByte == '\"')
+                m_channel = receivedByte;
                 m_packetStatus = Status::ChannelDone;
-            else
-            {
-                m_channel *= 10; // shift one decimal left
-                m_channel = (receivedByte - 48) + m_channel; // convert from ASCII and add
-            }
             break;
         case Status::ChannelDone:
-            if (receivedByte == ',')
-                m_packetStatus = Status::Separator;
-            break;
-        case Status::Separator:
-            if (receivedByte == '\"')
+            if (receivedByte == ',' || receivedByte == ' ')
                 m_packetStatus = Status::Count;
+            else
+                m_packetStatus = Status::None;
             break;
         case Status::Count:
-            if (receivedByte == '\"')
+            // we receive the the LSB first and Teensy 3.6 is little endian
+            // so we need to fill in from the left
+            m_count = m_count >> 8; // shift right by 8 bit
+            m_count |= (receivedByte << 8); // add received byte to the left
+            m_byteCounter++;
+
+            if (m_byteCounter > 1) {
                 m_packetStatus = Status::CountDone;
-            else
-            {
-                m_count *= 10; // shift one decimal left
-                m_count = (receivedByte - 48) + m_count; // convert from ASCII and add
+                m_byteCounter = 0;
             }
             break;
         case Status::CountDone:

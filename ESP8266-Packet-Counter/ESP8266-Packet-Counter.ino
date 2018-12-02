@@ -74,7 +74,7 @@ struct SnifferPacket{
 
 static os_timer_t channelHop_timer;
 
-uint32_t packetCount[MAX_CHANNELS + 1] = {0};
+uint16_t packetCount[MAX_CHANNELS + 1] = {0};
 uint8_t currentChannel = 1;
 elapsedMillis LEDtimer;
 bool isLEDOn = false;
@@ -87,21 +87,31 @@ static void ICACHE_FLASH_ATTR sniffer_callback(uint8_t *buffer, uint16_t length)
   packetCount[currentChannel]++;
 }
 
+
 /**
  * Callback for channel hoping
  */
 void channelHop()
 {
-  // send out data
-  Serial.print("{\"");
-  Serial.print(currentChannel, DEC);
+  // start packet
+  Serial.print("{");
+  // send channel number as byte
+  Serial.write(currentChannel);
 
-  Serial.print("\",\"");
-  Serial.print(packetCount[currentChannel], DEC);
+  // send delimiter
+  Serial.print(",");
 
-  Serial.println("\"}");
+  // send packet count
+  // the NodeMCU is a little endian system so we send the LSB first
+  uint8_t* p = reinterpret_cast<uint8_t *>( &packetCount[currentChannel] );
+  Serial.write(p[0]);
+  Serial.write(p[1]);
 
-  // hoping channels
+  // close packet
+  Serial.print("}");
+  //Serial.print("\n");
+
+  // hop to the next higher channels
   currentChannel = wifi_get_channel() + 1;
   if (currentChannel >= MAX_CHANNELS)
     currentChannel = 1;
