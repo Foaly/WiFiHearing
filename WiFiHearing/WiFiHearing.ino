@@ -28,7 +28,7 @@
 
 #include <cmath>
 
-#define CHANNELS 13
+const int numWifiChannels = 13;
 
 const int buttonPin = 33;
 Bounce pushbutton = Bounce(buttonPin, 10);  // 10 ms debounce
@@ -44,13 +44,13 @@ struct SoundGenerator
     unsigned int rateInMs;
 };
 
-SoundGenerator soundGenerators[CHANNELS];
+SoundGenerator soundGenerators[numWifiChannels];
 /* Frequencies taken from https://en.wikipedia.org/wiki/Piano_key_frequencies */
-                                       /*    D♯₂,   F♯₂,     G♯₂,     A♯₂,     C♯₃,     D♯₃,     F♯₃,     G♯₃,     A♯₃,    C♯₄,      D♯₄,     F♯₄,    G♯₄ */
-const float pentatonicScale[CHANNELS] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f };
+                                              /*    D♯₂,   F♯₂,     G♯₂,     A♯₂,     C♯₃,     D♯₃,     F♯₃,     G♯₃,     A♯₃,    C♯₄,      D♯₄,     F♯₄,    G♯₄ */
+const float pentatonicScale[numWifiChannels] = { 77.78f, 92.5f, 103.83f, 116.54f, 138.59f, 155.56f, 184.99f, 207.65f, 233.08f, 277.18f, 311.13f, 369.99f, 415.3f };
 
-                                               /*    D♯₂,     F♯₃,     C♯₄,     F♯₄,     A♯₄,     D♯₅,     F♯₅,     G♯₅,     A♯₅,      C♯₆,      D♯₆,      G♯₆,      C♯₇ */
-const float pentatonicScaleCochlear[CHANNELS] = { 77.78f, 184.99f, 277.18f, 369.99f, 466.16f, 622.25f, 739.99f, 830.60f, 932.33f, 1108.73f, 1244.51f, 1661.22f, 2217.46f };
+                                                      /*    D♯₂,     F♯₃,     C♯₄,     F♯₄,     A♯₄,     D♯₅,     F♯₅,     G♯₅,     A♯₅,      C♯₆,      D♯₆,      G♯₆,      C♯₇ */
+const float pentatonicScaleCochlear[numWifiChannels] = { 77.78f, 184.99f, 277.18f, 369.99f, 466.16f, 622.25f, 739.99f, 830.60f, 932.33f, 1108.73f, 1244.51f, 1661.22f, 2217.46f };
 
 // Audio graph
 AudioMixer4              mixer1;
@@ -110,7 +110,7 @@ float AWeightedGain(float f)
 // callback that is called everytime a channel update packet is succesfully received
 void packetParsed(uint8_t channel, uint16_t count)
 {
-    if (channel > 0 && channel <= CHANNELS)
+    if (channel > 0 && channel <= numWifiChannels)
     {
         if (count == 0)
             soundGenerators[channel - 1].rateInMs = 0;
@@ -144,7 +144,7 @@ void setup() {
     audioShield.volume(0.8);  //0-1
 
     // setup the sound generators
-    for (unsigned int i = 0; i < CHANNELS; ++i)
+    for (unsigned int i = 0; i < numWifiChannels; ++i)
     {
         soundGenerators[i].waveform.begin(WAVEFORM_SINE);
         soundGenerators[i].waveform.amplitude( AWeightedGain( pentatonicScaleCochlear[i] ) );
@@ -208,7 +208,7 @@ void loop() {
             if (isCyborg)
                 scale = const_cast<float*>(pentatonicScaleCochlear);
 
-            for (unsigned int i = 0; i < CHANNELS; ++i)
+            for (unsigned int i = 0; i < numWifiChannels; ++i)
             {
                 soundGenerators[i].waveform.amplitude( AWeightedGain( scale[i] ) );
                 soundGenerators[i].waveform.frequency( scale[i] );
