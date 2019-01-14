@@ -22,12 +22,18 @@
 #include <SPI.h>
 #include <SD.h>
 #include <SerialFlash.h>
+#include <Bounce.h>
 
 #include "PacketParser.h"
 
 #include <cmath>
 
 #define CHANNELS 13
+
+const int buttonPin = 33;
+Bounce pushbutton = Bounce(buttonPin, 10);  // 10 ms debounce
+
+bool isCyborg = true;
 
 struct SoundGenerator
 {
@@ -131,6 +137,8 @@ void setup() {
     Serial4.begin(115200);
     Serial.begin(115200);
 
+    pinMode(buttonPin, INPUT_PULLUP);
+
     AudioMemory(150);
     audioShield.enable();
     audioShield.volume(0.8);  //0-1
@@ -170,6 +178,7 @@ void setup() {
     mixer4.gain(3, 0.0625f);
 }
 
+
 void loop() {
     // parse serial input
     if (Serial4.available() > 0)
@@ -187,6 +196,23 @@ void loop() {
         {
             soundGenerator.envelope.noteOn();
             soundGenerator.elapsedMs = 0;
+        }
+    }
+
+    // On button press change from the regular to the cochlear implant scale
+    if (pushbutton.update()) { // true if pin state changed
+        if (pushbutton.fallingEdge()) {  // button was released
+            isCyborg = !isCyborg;
+
+            float* scale = const_cast<float*>(pentatonicScale);
+            if (isCyborg)
+                scale = const_cast<float*>(pentatonicScaleCochlear);
+
+            for (unsigned int i = 0; i < CHANNELS; ++i)
+            {
+                soundGenerators[i].waveform.amplitude( AWeightedGain( scale[i] ) );
+                soundGenerators[i].waveform.frequency( scale[i] );
+            }
         }
     }
 }
