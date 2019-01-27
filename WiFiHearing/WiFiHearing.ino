@@ -19,9 +19,11 @@
 
 #include <Audio.h>
 #include <Wire.h>
+
+#include <SerialFlash.h>
 #include <SPI.h>
 #include <SD.h>
-#include <SerialFlash.h>
+
 #include <Bounce.h>
 
 #include "PacketParser.h"
@@ -88,6 +90,15 @@ unsigned int countToBPM(unsigned int packetCount)
 }
 
 
+// convert packet count to envelope hold time in ms
+float countToHold(unsigned int packetCount)
+{
+    if (packetCount > 525)
+        return 90.f;
+    return packetCount * -0.4f + 300.f;
+}
+
+
 unsigned int BPMtoMs(unsigned int BPM)
 {
     return static_cast<unsigned int >(std::round((60.f * 1000.f) / BPM));
@@ -123,6 +134,7 @@ void packetParsed(uint8_t channel, uint16_t count)
             Serial.print(" ms: ");
             Serial.println(ms);*/
             soundGenerators[channel - 1].rateInMs = ms;
+            soundGenerators[channel - 1].envelope.hold(countToHold(count));
         }
         //soundGenerators[channel - 1].envelope.noteOn();
         soundGenerators[channel - 1].elapsedMs = 0;
