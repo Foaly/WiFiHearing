@@ -155,12 +155,16 @@ void setup() {
     audioShield.enable();
     audioShield.volume(0.8);  //0-1
 
+    const float* currentScale = pentatonicScale;
+    if (isCyborg)
+        currentScale = pentatonicScaleCochlear;
+
     // setup the sound generators
     for (unsigned int i = 0; i < numWifiChannels; ++i)
     {
         soundGenerators[i].waveform.begin(WAVEFORM_SINE);
-        soundGenerators[i].waveform.amplitude( AWeightedGain( pentatonicScaleCochlear[i] ) );
-        soundGenerators[i].waveform.frequency( pentatonicScaleCochlear[i] );
+        soundGenerators[i].waveform.amplitude( AWeightedGain( currentScale[i] ) );
+        soundGenerators[i].waveform.frequency( currentScale[i] );
 
         soundGenerators[i].envelope.attack(10.f);
         soundGenerators[i].envelope.hold(90.f);
@@ -216,14 +220,14 @@ void loop() {
         if (pushbutton.fallingEdge()) {  // button was released
             isCyborg = !isCyborg;
 
-            float* scale = const_cast<float*>(pentatonicScale);
+            const float* currentScale = pentatonicScale;
             if (isCyborg)
-                scale = const_cast<float*>(pentatonicScaleCochlear);
+                currentScale = pentatonicScaleCochlear;
 
             for (unsigned int i = 0; i < numWifiChannels; ++i)
             {
-                soundGenerators[i].waveform.amplitude( AWeightedGain( scale[i] ) );
-                soundGenerators[i].waveform.frequency( scale[i] );
+                soundGenerators[i].waveform.amplitude( AWeightedGain( currentScale[i] ) );
+                soundGenerators[i].waveform.frequency( currentScale[i] );
             }
         }
     }
