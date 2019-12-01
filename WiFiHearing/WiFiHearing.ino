@@ -91,7 +91,7 @@ unsigned int countToBPM(unsigned int packetCount)
 
 
 // convert packet count to envelope hold time in ms
-float countToHold(unsigned int packetCount)
+float countToHoldTime(unsigned int packetCount)
 {
     if (packetCount > 525)
         return 90.f;
@@ -134,7 +134,7 @@ void packetParsed(uint8_t channel, uint16_t count)
             Serial.print(" ms: ");
             Serial.println(ms);*/
             soundGenerators[channel - 1].rateInMs = ms;
-            soundGenerators[channel - 1].envelope.hold(countToHold(count));
+            soundGenerators[channel - 1].envelope.hold(countToHoldTime(count));
         }
         //soundGenerators[channel - 1].envelope.noteOn();
         soundGenerators[channel - 1].elapsedMs = 0;
@@ -175,7 +175,7 @@ void setup() {
         soundGenerators[i].rateInMs = 0;
     }
 
-    // crude way to avoid clipping
+    // crude way to avoid clipping by making sure summed up the signal can't go over 1.0
     mixer1.gain(0, 0.25f);
     mixer1.gain(1, 0.25f);
     mixer1.gain(2, 0.25f);
