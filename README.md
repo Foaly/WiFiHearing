@@ -12,6 +12,9 @@ Schematic
 
 ![The schematic](./schematic.png)
 
+The WiFi Hearing is designed to be used togehter with a cochlear implant as an extention of the senses for data, but it can also be used together with headphones.
+You can read more about it in more details in this [blog post](https://foaly.github.io/wifi-hearing.html).
+
 ![The full setup](./full_setup.png)
 
 
